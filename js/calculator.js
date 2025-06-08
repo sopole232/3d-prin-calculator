@@ -717,15 +717,14 @@ class Calculator {
                 section.classList.add('hidden');
             }
         }
-    }
-
-    agregarFilamentoAdicional() {
+    }    agregarFilamentoAdicional() {
         const container = document.getElementById('filamentosAdicionales');
         if (!container) return;
 
-        const filamentSelect = this.data.filamentos.map(f => 
-            `<option value="${f.id}">${f.nombre} (${f.tipo}) - ${f.precioPorKg.toFixed(2)} €/kg</option>`
-        ).join('');
+        const filamentSelect = this.data.filamentos.map(f => {
+            const colorInfo = f.color ? ` [${f.color}]` : '';
+            return `<option value="${f.id}">${f.nombre} (${f.tipo})${colorInfo} - ${f.precioPorKg.toFixed(2)} €/kg</option>`;
+        }).join('');
 
         const div = document.createElement('div');
         div.innerHTML = `

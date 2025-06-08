@@ -112,7 +112,12 @@
                         </div>                         
                         <div class="form-group"> 
                             <label>Filamento principal:</label>                             
-                            <select id="filamentoSeleccionado"></select>                             
+                            <select id="filamentoSeleccionado" onchange="mostrarInfoFilamento()"></select>
+                            <!-- Indicador de color del filamento -->
+                            <div id="filamentoColorIndicator" class="filamento-color-indicator" style="display: none;">
+                                <span class="color-muestra" id="filamentoColorMuestra"></span>
+                                <span class="color-texto" id="filamentoColorTexto"></span>
+                            </div>                             
                         </div>                         
                     </div>                     
                     <div class="form-row"> 

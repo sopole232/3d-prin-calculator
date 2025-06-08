@@ -1406,6 +1406,67 @@ body::before {
     opacity: 0.8;
 }
 
+/* =================================================================
+   Indicador de Color del Filamento
+   ================================================================= */
+
+.filamento-color-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 6px;
+    border: 1px solid rgba(159, 168, 218, 0.3);
+    font-size: 0.9em;
+    color: var(--color-cosmic-mist);
+    animation: fadeInColor 0.3s ease-in;
+}
+
+.color-muestra {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: #ddd;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.color-texto {
+    font-weight: 500;
+    color: var(--color-nebula-blue);
+}
+
+@keyframes fadeInColor {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Para casos cuando no hay color especificado */
+.color-muestra.sin-color {
+    background: linear-gradient(45deg, 
+        transparent 40%, 
+        #ff6b6b 40%, 
+        #ff6b6b 60%, 
+        transparent 60%);
+    background-size: 6px 6px;
+    background-color: #f0f0f0;
+}
+
+.filamento-color-indicator.sin-color .color-texto {
+    color: var(--color-warning);
+    font-style: italic;
+}
+
 /* ==============================
    MATERIAL MANAGEMENT STYLES
    ============================== */

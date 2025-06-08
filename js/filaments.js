@@ -182,9 +182,7 @@ class FilamentManager {
         });
 
         lista.innerHTML = html;
-    }
-
-    updateSelects() {
+    }    updateSelects() {
         const select = document.getElementById('filamentoSeleccionado');
         if (!select) return;
 
@@ -193,7 +191,11 @@ class FilamentManager {
         this.data.filamentos.forEach(filament => {
             const option = document.createElement('option');
             option.value = filament.id;
-            option.textContent = `${filament.nombre} (${filament.tipo}) - ${filament.precioPorKg.toFixed(2)} €/kg`;
+            
+            // Incluir el color en el texto si está disponible
+            const colorInfo = filament.color ? ` [${filament.color}]` : '';
+            option.textContent = `${filament.nombre} (${filament.tipo})${colorInfo} - ${filament.precioPorKg.toFixed(2)} €/kg`;
+            
             select.appendChild(option);
         });
     }
@@ -288,4 +290,101 @@ function eliminarFilamento(id) {
 
 function updateScale(type, value) {
     UI.updateScale(type, value);
+}
+
+// Función para mostrar información del filamento seleccionado
+function mostrarInfoFilamento() {
+    const select = document.getElementById('filamentoSeleccionado');
+    const indicador = document.getElementById('filamentoColorIndicator');
+    const colorMuestra = document.getElementById('filamentoColorMuestra');
+    const colorTexto = document.getElementById('filamentoColorTexto');
+    
+    if (!select || !indicador || !colorMuestra || !colorTexto) return;
+    
+    const filamentoId = select.value;
+    
+    // Si no hay filamento seleccionado, ocultar indicador
+    if (!filamentoId) {
+        indicador.style.display = 'none';
+        return;
+    }
+    
+    // Buscar el filamento en los datos
+    const filamento = window.app?.data?.filamentos?.find(f => f.id == filamentoId);
+    
+    if (!filamento) {
+        indicador.style.display = 'none';
+        return;
+    }
+    
+    // Mostrar el indicador
+    indicador.style.display = 'flex';
+    
+    // Configurar el color
+    if (filamento.color && filamento.color.trim() !== '') {
+        const colorNormalizado = normalizarColor(filamento.color.trim());
+        colorMuestra.style.background = colorNormalizado;
+        colorMuestra.classList.remove('sin-color');
+        colorTexto.textContent = `Color: ${filamento.color}`;
+        indicador.classList.remove('sin-color');
+    } else {
+        colorMuestra.classList.add('sin-color');
+        colorTexto.textContent = 'Sin color especificado';
+        indicador.classList.add('sin-color');
+    }
+}
+
+// Función auxiliar para normalizar nombres de colores a valores CSS
+function normalizarColor(color) {
+    const coloresComunes = {
+        'rojo': '#FF6B6B',
+        'red': '#FF6B6B',
+        'azul': '#4ECDC4',
+        'blue': '#4ECDC4',
+        'verde': '#45B7D1',
+        'green': '#45B7D1',
+        'amarillo': '#FFF176',
+        'yellow': '#FFF176',
+        'negro': '#333333',
+        'black': '#333333',
+        'blanco': '#FFFFFF',
+        'white': '#FFFFFF',
+        'gris': '#9E9E9E',
+        'gray': '#9E9E9E',
+        'grey': '#9E9E9E',
+        'naranja': '#FF9800',
+        'orange': '#FF9800',
+        'rosa': '#F8BBD9',
+        'pink': '#F8BBD9',
+        'violeta': '#9C27B0',
+        'purple': '#9C27B0',
+        'morado': '#9C27B0',
+        'natural': '#F5F5DC',
+        'transparente': 'rgba(255,255,255,0.3)',
+        'transparent': 'rgba(255,255,255,0.3)',
+        'translúcido': 'rgba(255,255,255,0.5)',
+        'translucent': 'rgba(255,255,255,0.5)'
+    };
+    
+    const colorLower = color.toLowerCase();
+    
+    // Buscar coincidencia exacta primero
+    if (coloresComunes[colorLower]) {
+        return coloresComunes[colorLower];
+    }
+    
+    // Buscar coincidencia parcial
+    for (const [nombre, valor] of Object.entries(coloresComunes)) {
+        if (colorLower.includes(nombre) || nombre.includes(colorLower)) {
+            return valor;
+        }
+    }
+    
+    // Si ya es un color CSS válido (hex, rgb, etc.)
+    if (color.startsWith('#') || color.startsWith('rgb') || color.startsWith('hsl')) {
+        return color;
+    }
+    
+    // Color por defecto si no se reconoce
+    return '#9E9E9E';
 }
