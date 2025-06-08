@@ -1,0 +1,569 @@
+<!DOCTYPE html> 
+<html lang="es"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Panel Impresión 3D</title>         
+        <link rel="stylesheet" href="styles.css"> 
+    </head>     
+    <body> 
+        <div class="container">            <div class="header"> 
+                <h1>🖨️ Panel de Impresión 3D</h1> 
+                <p>Gestión completa de costos y filamentos • Guardado automático activo</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('filamentos')">📦 Filamentos</button>                 
+                <button class="tab" onclick="showTab('calculator')">🧮 Calculadora</button>                 
+                <button class="tab" onclick="showTab('perfiles-costos')">🖨️ Impresoras</button>                 
+                <button class="tab" onclick="showTab('historico')">📊 Histórico</button>                 
+                <button class="tab" onclick="showTab('configuracion')">⚙️ Configuración</button>                 
+            </div>             
+            <!-- Contenido de las pestañas -->             
+            <div id="filamentos" class="tab-content active"> 
+                <h2>Gestión de Filamentos</h2> 
+                <div class="card"> 
+                    <h3>Agregar Nuevo Filamento</h3> 
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Nombre/Marca:</label>                             
+                            <input type="text" id="nombreFilamento" placeholder="Ej: Prusament PLA"> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Tipo de Material:</label>                             
+                            <select id="tipoMaterial"> 
+                                <option value="">🔄 Cargando materiales...</option>                                 
+                            </select>                             
+                        </div>                         
+                    </div>                     
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Color (opcional):</label>                             
+                            <input type="text" id="colorFilamento" placeholder="Ej: Azul, Rojo, Natural"> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Peso del rollo (kg):</label>                             
+                            <input type="number" id="pesoRollo" value="1" step="0.1" min="0.1"> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Precio total pagado (€):</label>                             
+                            <input type="number" id="precioTotal" step="0.01" min="0" placeholder="25.99"> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Precio por kg (€/kg) - Calculado automáticamente:</label>                             
+                            <input type="number" id="precioPorKg" readonly> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-group"> 
+                        <label>URL de compra (opcional):</label>                         
+                        <input type="url" id="urlFilamento" placeholder="https://tienda.com/producto-filamento"> <small>Enlace donde compraste o donde se puede comprar este filamento</small> 
+                    </div>                     
+                    <div class="form-row-vertical"> 
+                        <div class="form-group"> 
+                            <label>Dificultad de impresión (1-10):</label>                             
+                            <div class="scale-input"> 
+                                <input type="range" id="dificultadImpresion" min="1" max="10" value="3" oninput="UI.updateScale('dificultad', this.value)"> <span class="scale-value" id="dificultadValue">3</span> 
+                            </div>                             <small>1=Muy fácil, 10=Muy difícil</small> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Desgaste de impresora (1-10):</label>                             
+                            <div class="scale-input"> 
+                                <input type="range" id="desgasteImpresora" min="1" max="10" value="3" oninput="UI.updateScale('desgaste', this.value)"> <span class="scale-value" id="desgasteValue">3</span> 
+                            </div>                             <small>1=Mínimo desgaste, 10=Alto desgaste</small> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-group-single"> 
+                        <label>¿Requiere secado?</label>                         
+                        <select id="requiereSecado"> 
+                            <option value="no">No</option>                             
+                            <option value="si">Sí</option>                             
+                        </select>                         
+                    </div>                     
+                    <div class="form-actions"> 
+                        <button class="btn btn-success" onclick="agregarFilamento()">➕ Agregar Filamento</button>                         
+                    </div>                     
+                </div>                 
+                <div class="card"> 
+                    <div class="section-header"> 
+                        <h3>Filamentos Registrados</h3> 
+                        <button class="btn" onclick="app.managers.filament.exportarFilamentos()" title="Exportar filamentos a CSV"> 
+                            📊 Exportar CSV
+</button>                         
+                    </div>                     
+                    <div id="listaFilamentos"></div>                     
+                </div>                 
+            </div>             
+            <div id="calculator" class="tab-content"> 
+                <h2>Calculadora de Costos</h2> 
+                <div class="active-profile-display" id="perfilActivo"> 
+                    <h3>📋 Perfil Activo: <span id="nombrePerfilActivo">Ninguno seleccionado</span></h3> 
+                    <div id="resumenPerfilActivo"></div>                     
+                </div>                 
+                <div class="card"> 
+                    <h3>Datos de la Impresión</h3> 
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Perfil de impresora:</label>                             
+                            <select id="perfilSeleccionado" onchange="cambiarPerfilActivo()"> 
+                                <option value="">Selecciona un perfil</option>                                 
+                            </select>                             
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Filamento principal:</label>                             
+                            <select id="filamentoSeleccionado"></select>                             
+                        </div>                         
+                    </div>                     
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Cantidad usada (gramos):</label>                             
+                            <input type="number" id="cantidadFilamento" min="0" step="0.1" placeholder="Ej: 50"> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Tiempo de impresión (horas):</label>                             
+                            <input type="number" id="tiempoImpresion" min="0" step="0.1" placeholder="Ej: 3.5"> 
+                        </div>                         
+                    </div>                     
+                    <div class="cost-config-section"> 
+                        <h4>👨‍💼 Mano de Obra</h4> 
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Tiempo de mano de obra (horas):</label>                                 
+                                <input type="number" id="tiempoManoObra" min="0" step="0.1" placeholder="Ej: 0.5"> 
+                            </div>                             
+                            <div class="form-group"> 
+                                <label>Tarifa por hora del operador (€/h):</label>                                 
+                                <input type="number" id="tarifaOperador" min="0" step="0.01" readonly class="input-readonly"> <small>📝 Configurado en Ajustes → Configuración</small> 
+                            </div>                             
+                        </div>                         
+                    </div>                     
+                    <div class="form-group"> 
+                        <label>¿Impresión multicolor/multi-material?</label>                         
+                        <select id="esMultiMaterial" onchange="toggleMultiMaterial()"> 
+                            <option value="no">No</option>                             
+                            <option value="si">Sí</option>                             
+                        </select>                         
+                    </div>                     
+                    <div id="multiMaterialSection" class="multi-filament hidden"> 
+                        <h4>Filamentos adicionales</h4> 
+                        <div id="filamentosAdicionales"></div>                         
+                        <button type="button" class="btn" onclick="agregarFilamentoAdicional()">+ Agregar filamento</button>                         
+                    </div>                     
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Tipo de boquilla:</label>                             
+                            <select id="tipoBoquilla"> 
+                                <option value="estandar">Estándar (€0)</option>                                 
+                                <option value="hardened">Hardened Steel (+€2)</option>                                 
+                                <option value="ruby">Ruby (+€5)</option>                                 
+                            </select>                             
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Costo de piezas externas (€):</label>                             
+                            <input type="number" id="costoPiezasExternas" min="0" step="0.01" placeholder="Ej: 5.50" value="0"> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-actions"> 
+                        <button class="btn btn-success" onclick="calcularCosto()">🧮 Calcular Costo</button>                         
+                    </div>                     
+                </div>                 
+                <div id="resultadoCalculo"></div>                 
+            </div>             
+            <div id="perfiles-costos" class="tab-content"> 
+                <h2>Gestión de Impresoras y Perfiles de Costos</h2> 
+                <div class="card"> 
+                    <h3>Agregar Nueva Impresora</h3> 
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Nombre de la Impresora:</label>                             
+                            <input type="text" id="nombrePerfil" placeholder="Ej: Prusa i3 MK3S+ - Casa"> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Modelo de Impresora:</label>                             
+                            <input type="text" id="modeloPerfil" placeholder="Ej: Prusa i3 MK3S+"> 
+                        </div>                         
+                    </div>                     
+                    <div class="cost-config-section"> 
+                        <h4>💰 Configuración de Amortización de Impresora</h4> 
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Costo total de la impresora (€):</label>                                 
+                                <input type="number" id="costoImpresora" min="0" step="0.01" placeholder="Ej: 800" value="800"> <small>Precio pagado por la impresora (incluye accesorios, envío, etc.)</small> 
+                            </div>                             
+                            <div class="form-group"> 
+                                <label>Horas de impresión para amortizar:</label>                                 
+                                <input type="number" id="tiempoAmortizacion" min="1" placeholder="Ej: 1000" value="1000"> <small>En cuántas horas de impresión quieres recuperar la inversión</small> 
+                            </div>                             
+                        </div>                         
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Factor de amortización (€/hora):</label>                                 
+                                <input type="number" id="factorAmortizacionPerfil" min="0" step="0.0001" readonly class="input-readonly-secondary"> <small>Se calcula automáticamente: Costo Impresora ÷ Horas de Amortización</small> 
+                            </div>                             
+                        </div>                         
+                        <div id="estadisticasAmortizacion" class="stats-amortization"></div>                         
+                    </div>                     
+                    <div class="cost-config-section"> 
+                        <h4>⚡ Configuración de Electricidad</h4> 
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Potencia de consumo (W):</label>                                 
+                                <input type="number" id="potenciaPerfil" min="0" placeholder="Ej: 200" value="200"> 
+                            </div>                             
+                            <div class="form-group"> 
+                                <label>Costo de electricidad (€/kWh):</label>                                 
+                                <input type="number" id="costoElectricidadPerfil" min="0" step="0.001" placeholder="Ej: 0.150" value="0.15"> 
+                            </div>                             
+                        </div>                         
+                    </div>                     
+                    <div class="cost-config-section"> 
+                        <h4>🔧 Configuración de Mantenimiento</h4> 
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Costo de mantenimiento (€):</label>                                 
+                                <input type="number" id="costoMantenimientoPerfil" min="0" step="0.01" placeholder="Ej: 60" value="60"> <small>Costo cada vez que se hace mantenimiento completo</small> 
+                            </div>                             
+                            <div class="form-group"> 
+                                <label>Intervalo de mantenimiento (horas):</label>                                 
+                                <input type="number" id="intervaloMantenimientoPerfil" min="1" placeholder="Ej: 250" value="250"> <small>Cada cuántas horas se requiere mantenimiento</small> 
+                            </div>                             
+                        </div>                         
+                    </div>                     
+                    <div class="cost-config-section"> 
+                        <h4>📦 Configuración de Material y Errores</h4> 
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>Desperdicio de material (%):</label>                                 
+                                <input type="number" id="desperdicioMaterialPerfil" min="0" step="0.1" placeholder="Ej: 5" value="5"> <small>Porcentaje de material perdido en soportes, purgas, etc.</small> 
+                            </div>                             
+                            <div class="form-group"> 
+                                <label>Recargo por impresión multi-material (%):</label>                                 
+                                <input type="number" id="recargoMultiMaterialPerfil" min="0" step="0.1" placeholder="Ej: 15" value="15"> <small>Recargo adicional por mayor complejidad y posibles errores en multicolor</small> 
+                            </div>                             
+                        </div>                         
+                        <div class="form-row"> 
+                            <div class="form-group"> 
+                                <label>🛡️ Factor de Seguridad para Errores (multiplicador):</label>                                 
+                                <input type="number" id="bufferErroresPerfil" min="1" step="0.1" placeholder="Ej: 2.0" value="2" oninput="mostrarEstadisticasAmortizacion()"> <small><strong>⚠️ IMPORTANTE:</strong> Solo se aplica a costos variables (material, electricidad, mantenimiento)</small> <small>Factor 2.0 = 100% extra, Factor 1.5 = 50% extra, Factor 1.2 = 20% extra</small> 
+                            </div>                             
+                        </div>                         
+
+                        <div class="bg-info info-section"> <strong>💡 ¿Qué es el Factor de Seguridad?</strong>
+                            <br> <small class="info-detail"> 
+                        • Multiplica los costos variables para compensar posibles fallos<br> 
+                        • Costos que SÍ se multiplican: Material, Electricidad, Mantenimiento<br> 
+                        • Costos que NO se multiplican: Amortización, Mano de obra, Boquilla, Piezas externas<br> 
+                        • Ejemplo: Factor 2.0 en impresión de €10 → €20 en costos variables + costos fijos normales
+ </small> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-actions"> 
+                        <button class="btn btn-success" onclick="crearPerfil()">➕ Agregar Impresora</button>                         
+                    </div>                     
+                </div>                 
+                <div class="card"> 
+                    <h3>Impresoras Registradas</h3> 
+                    <div id="listaPerfiles"></div>                     
+                </div>                 
+            </div>             
+            <div id="historico" class="tab-content"> 
+                <h2>Histórico de Cálculos</h2> 
+                <div class="card"> 
+                    <button class="btn btn-danger" onclick="HistoryManager.limpiar()">🗑️ Limpiar Histórico</button>                     
+                </div>                 
+                <div id="listaHistorico"></div>                 
+            </div>             
+            <div id="configuracion" class="tab-content"> 
+                <h2>Configuración General</h2> 
+                <div class="card"> 
+                    <h3>Estado del Guardado Automático</h3> 
+                    <div class="bg-success success-section"> 
+                        <h4>✅ Guardado Automático Activo</h4> 
+                        <ul class="feature-list"> 
+                            <li>Los datos se guardan automáticamente cada 30 segundos</li>                             
+                            <li>Se crean backups automáticos cada 5 minutos</li>                             
+                            <li>Todo se almacena localmente en tu navegador</li>                             
+                            <li>No necesitas hacer nada manual</li>                             
+                        </ul>                         
+                        <div class="button-section"> 
+                            <button class="btn btn-secondary" onclick="DataManager.mostrarInfoBackup()">📦 Ver Info de Backups</button>                             
+                            <button class="btn btn-secondary" onclick="DataManager.exportarBackupManual()">💾 Descargar Backup Manual</button>                             
+                        </div>                         
+                    </div>                     
+                </div>                 
+                <div class="card"> 
+                    <h3>Configuración de Precios y Negocio</h3> 
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Margen de ganancia por defecto (%):</label>                             
+                            <input type="number" id="gananciaPorDefecto" min="0" step="1" placeholder="Ej: 30" value="30"> <small>Margen aplicado cuando no se especifica uno en el perfil de impresora</small> 
+                        </div>                         
+                        <div class="form-group"> 
+                            <label>Redondeo de precios:</label>                             
+                            <select id="redondeoPrecios"> 
+                                <option value="0.01">Centimos (€0.01)</option>                                 
+                                <option value="0.05">5 centimos (€0.05)</option>                                 
+                                <option value="0.10">10 centimos (€0.10)</option>                                 
+                                <option value="0.50">50 centimos (€0.50)</option>                                 
+                                <option value="1.00">Euros (€1.00)</option>                                 
+                            </select>                             
+                        </div>                         
+                    </div>                     
+                    <div class="form-row"> 
+                        <div class="form-group"> 
+                            <label>Tarifa por hora del operador (€/h):</label>                             
+                            <input type="number" id="tarifaOperadorDefecto" min="0" step="0.01" placeholder="Ej: 15.00" value="15"> <small>Tarifa estándar para mano de obra en cálculos</small> 
+                        </div>                         
+                    </div>                     
+                    <div class="form-actions"> 
+                        <button class="btn btn-success" onclick="guardarConfiguracionGeneral()">💾 Guardar Configuración (Auto-Guardado)</button>                         
+                    </div>                     
+                </div>                 
+                <div class="card"> 
+                    <h3>☁️ Sincronización en la Nube</h3>
+                    <div id="cloudSyncSection"></div>
+                </div>
+                
+                <div class="card"> 
+                    <h3>Gestión de Datos</h3> 
+                    <div class="button-group"> 
+                        <button class="btn" onclick="exportarDatos()">📤 Exportar Datos (Descargar)</button>                         
+                        <button class="btn" onclick="importarDatos()">📥 Importar Datos (Subir Archivo)</button>                         
+                        <button class="btn btn-danger" onclick="limpiarBaseDatos()">🗑️ Limpiar Todo</button>                         
+                    </div>                     <small class="info-note"> 
+                    💡 Los datos siempre se guardan automáticamente. La exportación es solo para hacer copias de seguridad externas.
+ </small> 
+                </div>                 
+                <div class="card"> 
+                    <div id="formulasPersonalizadas"></div>                     
+                </div>                 
+                <div class="card"> 
+                    <div id="materialesPersonalizados"></div>                     
+                </div>                 
+                <div class="card"> 
+                    <h3>Información del Sistema</h3> 
+                    <p><strong>Versión:</strong> 2.0.0 (Guardado Automático)</p> 
+                    <p><strong>Última actualización:</strong> <span id="fechaActualizacion"></span></p> 
+                    <p><strong>Almacenamiento:</strong> localStorage + IndexedDB (respaldo)</p> 
+                    <p><strong>Auto-guardado:</strong> ✅ Activo (cada 30 segundos)</p> 
+                    <p><strong>Filamentos registrados:</strong> <span id="contadorFilamentos">0</span></p> 
+                    <p><strong>Impresoras registradas:</strong> <span id="contadorImpresoras">0</span></p> 
+                    <p><strong>Cálculos en histórico:</strong> <span id="contadorCalculos">0</span></p> 
+                </div>                 
+            </div>             
+        </div>         
+        <!-- Indicador de estado mejorado -->         
+        <div id="dbStatus" class="db-status" style="margin-bottom: 84px;">🔄 Inicializando auto-guardado...</div>         
+        <!-- Scripts modulares - CON FILE STORAGE PRIMERO -->
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+        
+        <script src="js/file-storage.js"></script>
+        <script src="js/firebase-storage.js"></script>
+        <script src="js/cloud-sync-manager.js"></script>         
+        <script src="formulas/formulas-costos.js"></script>         
+        <script src="formulas/formulas-finales.js"></script>         
+        <script src="js/storage.js"></script>         
+        <script src="js/user-storage.js"></script>         
+        <script src="js/firebase-storage.js"></script>         
+        <script src="js/cloud-sync-manager.js"></script>         
+        <script src="js/auth.js"></script>         
+        <script src="js/auth-ui.js"></script>         
+        <script src="js/ui.js"></script>         
+        <script src="js/config.js"></script>         
+        <script src="js/filaments.js"></script>         
+        <script src="js/profiles.js"></script>         
+        <script src="js/calculator.js"></script>         
+        <script src="js/history.js"></script>         
+        <script src="js/data.js"></script>         
+        <script src="js/backend-editor.js"></script>         
+        <script src="js/app.js"></script>         
+        <script src="js/database.js"></script>         
+        <script src="js/printers.js"></script>         
+        <!-- Debugging y compatibilidad - SIMPLIFICADO -->         
+        <script>
+        // Función de debugging básica
+        function debugApp() {
+            console.log('🔍 Estado de la aplicación:');
+            console.log('App:', window.app);
+            console.log('Managers disponibles:', window.app?.managers ? Object.keys(window.app.managers) : 'No disponibles');
+            console.log('Datos:', window.app?.data ? Object.keys(window.app.data) : 'No disponibles');
+        }
+
+        // Ejecutar debugging después de 2 segundos
+        setTimeout(debugApp, 2000);
+        window.debugApp = debugApp;
+
+        // Funciones compatibles con el archivo original
+        function agregarFilamento() {
+            if (window.app && window.app.managers.filament) {
+                window.app.managers.filament.agregar();
+            } else {
+                console.error('❌ FilamentManager no disponible');
+            }
+        }
+
+        function calcularCosto() {
+            if (window.app && window.app.managers.calculator) {
+                window.app.managers.calculator.calcular();
+            } else {
+                console.error('❌ Calculator no disponible');
+            }
+        }
+
+        function toggleMultiMaterial() {
+            if (window.app && window.app.managers.calculator) {
+                window.app.managers.calculator.toggleMultiMaterial();
+            } else {
+                console.error('❌ Calculator no disponible');
+            }
+        }
+
+        function agregarFilamentoAdicional() {
+            if (window.app && window.app.managers.calculator) {
+                window.app.managers.calculator.agregarFilamentoAdicional();
+            } else {
+                console.error('❌ Calculator no disponible');
+            }
+        }
+
+        function crearPerfil() {
+            if (window.app && window.app.managers.profile) {
+                window.app.managers.profile.crear();
+            } else {
+                console.error('❌ ProfileManager no disponible');
+            }
+        }
+
+        function seleccionarPerfil(id) {
+            if (window.app && window.app.managers.profile) {
+                window.app.managers.profile.seleccionar(id);
+            } else {
+                console.error('❌ ProfileManager no disponible');
+            }
+        }
+
+        function cambiarPerfilActivo() {
+            if (window.app && window.app.managers.profile) {
+                window.app.managers.profile.cambiarPerfilActivo();
+            } else {
+                console.error('❌ ProfileManager no disponible');
+            }
+        }
+
+        function calcularFactorAmortizacion() {
+            if (window.app && window.app.managers.profile) {
+                window.app.managers.profile.calcularFactorAmortizacion();
+            } else {
+                console.error('❌ ProfileManager no disponible');
+            }
+        }
+
+        function mostrarEstadisticasAmortizacion() {
+            if (window.app && window.app.managers.profile) {
+                window.app.managers.profile.mostrarEstadisticasAmortizacion();
+            } else {
+                console.error('❌ ProfileManager no disponible');
+            }
+        }
+
+        function limpiarHistorico() {
+            if (window.app && window.app.managers.history) {
+                window.app.managers.history.limpiar();
+            } else {
+                console.error('❌ HistoryManager no disponible');
+            }
+        }
+
+        function guardarConfiguracionGeneral() {
+            if (window.app && window.app.managers.config) {
+                window.app.managers.config.guardar();
+            } else {
+                console.error('❌ ConfigManager no disponible');
+            }
+        }
+
+        function exportarDatos() {
+            if (window.DataManager) {
+                DataManager.exportar();
+            } else {
+                console.error('❌ DataManager no disponible');
+            }
+        }
+
+        function importarDatos() {
+            if (window.DataManager) {
+                DataManager.importar();
+            } else {
+                console.error('❌ DataManager no disponible');
+            }
+        }
+
+        function limpiarBaseDatos() {
+            if (window.DataManager) {
+                DataManager.limpiarTodo();
+            } else {
+                console.error('❌ DataManager no disponible');
+            }
+        }
+
+        function updateScale(type, value) {
+            UI.updateScale(type, value);
+        }
+
+        // Inicialización de la aplicación
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 DOM cargado, inicializando aplicación...');
+            
+            try {
+                // Crear instancias globales
+                window.authManager = new AuthManager();
+                window.authUI = new AuthUI();
+                window.storageManager = new UserStorageManager();
+                window.app = new App();
+                
+                // Inicializar la aplicación
+                await window.app.init();
+                
+            } catch (error) {
+                console.error('❌ Error crítico inicializando aplicación:', error);
+                document.body.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ff4444;">
+                        <h2>❌ Error de Inicialización</h2>
+                        <p>Ha ocurrido un error crítico. Por favor recarga la página.</p>
+                        <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 10px;">🔄 Recargar</button>
+                    </div>
+                `;
+            }
+        });
+    </script>
+    
+    <!-- Sistema de sincronización rápida -->
+    <script src="js/quick-sync.js"></script>
+    
+    <!-- Sección de configuración de usuario en la parte inferior -->
+    <footer class="user-settings-footer">
+        <div id="userIndicator" class="user-settings-container" style="display: none;">
+            <div class="user-info-section">
+                <span id="currentUser" class="user-welcome">👤 Usuario</span>
+            </div>
+            <div class="user-actions-section">
+                <!-- Botones de sincronización compactos -->
+                <button id="uploadCloudBtn" class="cloud-action-btn" title="Subir a la nube" onclick="uploadToCloudQuick()">
+                    <span class="cloud-icon">☁️</span>
+                    <span class="arrow-up">↑</span>
+                </button>
+                <button id="downloadCloudBtn" class="cloud-action-btn" title="Descargar de la nube" onclick="downloadFromCloudQuick()">
+                    <span class="cloud-icon">☁️</span>
+                    <span class="arrow-down">↓</span>
+                </button>
+                <button id="userMenuBtn" class="user-settings-btn">⚙️ Configuración</button>
+            </div>
+        </div>
+    </footer>
+         
+    </body>     
+</html>
