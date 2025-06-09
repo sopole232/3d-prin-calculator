@@ -270,6 +270,18 @@
                             <div class="piece-item piece-principal" data-piece-id="principal">
                                 <h6>🔸 Pieza Principal</h6>
                                 
+                                <!-- Tiempo individual para esta pieza -->
+                                <div class="form-group">
+                                    <label>⏱️ Tiempo de impresión para esta pieza:</label>
+                                    <div class="time-input-group">
+                                        <input type="number" class="tiempo-pieza-horas" min="0" max="999" placeholder="Horas" style="width: 120px;" data-piece-id="principal">
+                                        <span>h</span>
+                                        <input type="number" class="tiempo-pieza-minutos" min="0" max="59" placeholder="Min" style="width: 100px;" data-piece-id="principal">
+                                        <span>m</span>
+                                    </div>
+                                    <small>Tiempo que tarda en imprimir solo esta pieza individual</small>
+                                </div>
+                                
                                 <!-- Selector tipo de material para esta pieza -->
                                 <div class="form-group">
                                     <label>🎨 Tipo de material:</label>

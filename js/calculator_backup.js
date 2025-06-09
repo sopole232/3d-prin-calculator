@@ -1621,10 +1621,10 @@ class Calculator {
             }
         });
         
-        return tiempoTotal;    }
+        return tiempoTotal;
+    }
 
-    // Actualizar el método obtenerDatosFormulario para la nueva estructura
-    obtenerDatosFormularioNuevo() {
+    // Actualizar el método obtenerDatosFormulario para la nueva estructuraobtenerDatosFormularioNuevo() {
         const tipoImpresion = document.getElementById('tipoImpresion').value;
         
         // Usar tarifa por defecto si no hay valor específico
