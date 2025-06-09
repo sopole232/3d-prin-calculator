@@ -846,6 +846,93 @@
                 // Inicializar la aplicación
                 await window.app.init();
                 
+                // === DIAGNÓSTICO TEMPORAL DEL BOTÓN CALCULAR ===
+                setTimeout(() => {
+                    console.log('🔍 === DIAGNÓSTICO DEL BOTÓN CALCULAR ===');
+                    
+                    // Test 1: Verificar window.app
+                    console.log('1. window.app:', typeof window.app, window.app ? '✅' : '❌');
+                    
+                    // Test 2: Verificar managers
+                    if (window.app && window.app.managers) {
+                        console.log('2. Managers disponibles:', Object.keys(window.app.managers));
+                        
+                        // Test 3: Verificar calculator
+                        if (window.app.managers.calculator) {
+                            console.log('3. Calculator existe: ✅');
+                            console.log('   - Método calcular:', typeof window.app.managers.calculator.calcular);
+                            console.log('   - Método obtenerDatosFormulario:', typeof window.app.managers.calculator.obtenerDatosFormulario);
+                            console.log('   - Método obtenerDatosFormularioNuevo:', typeof window.app.managers.calculator.obtenerDatosFormularioNuevo);
+                            console.log('   - Método validarDatos:', typeof window.app.managers.calculator.validarDatos);
+                        } else {
+                            console.log('3. Calculator NO existe: ❌');
+                        }
+                    } else {
+                        console.log('2. Managers NO existen: ❌');
+                    }
+                    
+                    // Test 4: Verificar función global
+                    console.log('4. Función global calcularCosto:', typeof window.calcularCosto);
+                    
+                    // Test 5: Verificar campos
+                    const tiempoHoras = document.getElementById('tiempoIndividualHoras');
+                    const tiempoMinutos = document.getElementById('tiempoIndividualMinutos');
+                    const tipoImpresion = document.getElementById('tipoImpresion');
+                    
+                    console.log('5. Campos críticos:');
+                    console.log('   - tiempoIndividualHoras:', tiempoHoras ? '✅' : '❌');
+                    console.log('   - tiempoIndividualMinutos:', tiempoMinutos ? '✅' : '❌');
+                    console.log('   - tipoImpresion:', tipoImpresion ? '✅' : '❌');
+                    
+                    if (tiempoHoras && tiempoMinutos) {
+                        console.log('   - Valores actuales:', tiempoHoras.value, 'h', tiempoMinutos.value, 'min');
+                    }
+                    
+                    // Test 6: Verificar datos de la app
+                    if (window.app && window.app.data) {
+                        console.log('6. Datos de la app:');
+                        console.log('   - Perfil activo:', window.app.data.perfilActivoId || 'NINGUNO');
+                        console.log('   - Filamentos:', window.app.data.filamentos?.length || 0);
+                        console.log('   - Perfiles:', window.app.data.perfilesCostos?.length || 0);
+                    }
+                    
+                    console.log('🔍 === FIN DEL DIAGNÓSTICO ===');
+                    
+                    // Crear función de debug global
+                    window.debugCalculateButton = function() {
+                        console.log('🔧 === DEBUG BOTÓN CALCULAR ===');
+                        try {
+                            if (window.app && window.app.managers && window.app.managers.calculator) {
+                                console.log('Intentando ejecutar cálculo...');
+                                
+                                // Intentar obtener datos
+                                const datos = window.app.managers.calculator.obtenerDatosFormulario();
+                                console.log('Datos obtenidos:', datos);
+                                
+                                // Intentar validar
+                                const esValido = window.app.managers.calculator.validarDatos(datos);
+                                console.log('Validación:', esValido ? '✅ PASÓ' : '❌ FALLÓ');
+                                
+                                if (esValido) {
+                                    console.log('Datos están OK, ejecutando cálculo...');
+                                    window.app.managers.calculator.calcular();
+                                    console.log('Cálculo ejecutado');
+                                } else {
+                                    console.log('Datos no válidos, revisar campos');
+                                }
+                                
+                            } else {
+                                console.log('❌ Calculator no disponible');
+                            }
+                        } catch (error) {
+                            console.error('❌ Error en debug:', error);
+                        }
+                    };
+                    
+                    console.log('💡 Función window.debugCalculateButton() disponible para pruebas');
+                    
+                }, 3000); // Esperar 3 segundos para que todo se cargue
+                
             } catch (error) {
                 console.error('❌ Error crítico inicializando aplicación:', error);
                 document.body.innerHTML = `
