@@ -157,6 +157,155 @@ body::before {
     text-shadow: 0 0 10px rgba(197, 202, 233, 0.5);
 }
 
+/* Header content layout - New structure for user buttons */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-title {
+    flex: 1;
+    text-align: center;
+}
+
+/* User indicator in header - Compact design */
+.user-indicator-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(26, 26, 46, 0.8);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(159, 168, 218, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--glow-blue);
+    z-index: 10;
+}
+
+.user-indicator-header .user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-indicator-header .user-welcome {
+    color: var(--color-stellar-white);
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.user-indicator-header .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Cloud action buttons - Compact style */
+.cloud-action-btn {
+    background: transparent;
+    border: 1px solid rgba(159, 168, 218, 0.4);
+    color: var(--color-stellar-white);
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 32px;
+    justify-content: center;
+}
+
+.cloud-action-btn:hover {
+    background: rgba(159, 168, 218, 0.2);
+    border-color: var(--color-nebula-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.cloud-action-btn .cloud-icon {
+    font-size: 1em;
+}
+
+.cloud-action-btn .arrow-up,
+.cloud-action-btn .arrow-down {
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* User settings button in header */
+.user-indicator-header .user-settings-btn {
+    background: var(--gradient-stellar);
+    border: 1px solid var(--color-galaxy-blue);
+    color: var(--color-stellar-white);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.user-indicator-header .user-settings-btn:hover {
+    background: var(--gradient-galaxy);
+    border-color: var(--color-plasma-blue);
+    transform: translateY(-1px);
+    box-shadow: var(--glow-blue);
+}
+
+/* Responsive design for header */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .user-indicator-header {
+        position: static;
+        transform: none;
+        margin-top: 15px;
+    }
+    
+    .header-title {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-indicator-header {
+        flex-direction: column;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .user-indicator-header .user-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cloud-action-btn {
+        flex: 1;
+        max-width: 60px;
+    }
+    
+    .user-indicator-header .user-settings-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
 /* NavegaciÃ³n de pestaÃ±as espacial */
 .tabs {
     display: flex;
@@ -1211,19 +1360,48 @@ body::before {
 }
 
 /* Animaciones suaves */
-@keyframes fadeInUp {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
     }
     to {
         opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
         transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-50px);
+        opacity: 0;
     }
 }
 
 .printing-mode-section {
-    animation: fadeInUp 0.4s ease-out;
+    animation: fadeIn 0.4s ease-out;
 }
 
 /* Responsive para nuevos elementos */
@@ -1360,4 +1538,225 @@ body::before {
     padding: 0;
     margin: 0;
     overflow: hidden;
+}
+
+/* Modal del Panel de Usuario */
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.auth-overlay .auth-container {
+    background: var(--gradient-nebula);
+    border: 2px solid var(--color-galaxy-blue);
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(159, 168, 218, 0.3);
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.auth-overlay .auth-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(159, 168, 218, 0.3);
+}
+
+.auth-overlay .auth-header h1 {
+    color: var(--color-stellar-white);
+    font-size: 1.8em;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.auth-overlay .auth-header p {
+    color: var(--color-cosmic-blue);
+    font-size: 1em;
+    margin: 0;
+}
+
+.auth-overlay .user-info {
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(159, 168, 218, 0.2);
+}
+
+.auth-overlay .user-info h3 {
+    color: var(--color-stellar-white);
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.auth-overlay .info-grid {
+    display: grid;
+    gap: 10px;
+}
+
+.auth-overlay .info-grid > div {
+    background: rgba(159, 168, 218, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid var(--color-galaxy-blue);
+}
+
+.auth-overlay .user-actions {
+    margin-bottom: 20px;
+}
+
+.auth-overlay .user-actions h3 {
+    color: var(--color-stellar-white);
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.auth-overlay .user-actions .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.auth-overlay .change-password-section {
+    background: rgba(26, 26, 46, 0.6);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(159, 168, 218, 0.2);
+    transition: all 0.3s ease;
+}
+
+.auth-overlay .change-password-section.hidden {
+    display: none;
+}
+
+.auth-overlay .change-password-section h4 {
+    color: var(--color-stellar-white);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.auth-overlay .form-group {
+    margin-bottom: 15px;
+}
+
+.auth-overlay .form-group label {
+    display: block;
+    color: var(--color-cosmic-blue);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.auth-overlay .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(159, 168, 218, 0.3);
+    border-radius: 8px;
+    background: rgba(26, 26, 46, 0.8);
+    color: var(--color-stellar-white);
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.auth-overlay .form-group input:focus {
+    outline: none;
+    border-color: var(--color-galaxy-blue);
+    box-shadow: 0 0 10px rgba(159, 168, 218, 0.3);
+}
+
+.auth-overlay .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.auth-overlay .modal-actions {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(159, 168, 218, 0.2);
+}
+
+.auth-overlay .auth-message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.auth-overlay .auth-message.success {
+    background: rgba(46, 204, 113, 0.2);
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+}
+
+.auth-overlay .auth-message.error {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+}
+
+.auth-overlay .auth-message.info {
+    background: rgba(52, 152, 219, 0.2);
+    border: 1px solid #3498db;
+    color: #3498db;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+    .auth-overlay .auth-container {
+        width: 95%;
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .auth-overlay .form-actions {
+        flex-direction: column;
+    }
+    
+    .auth-overlay .user-actions .btn {
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-overlay .auth-container {
+        width: 98%;
+        padding: 15px;
+        margin: 5px;
+    }
+    
+    .auth-overlay .auth-header h1 {
+        font-size: 1.5em;
+    }
 }

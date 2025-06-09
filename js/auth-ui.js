@@ -230,12 +230,23 @@ class AuthUI {
         if (messageDiv) {
             messageDiv.textContent = '';
             messageDiv.className = 'auth-message';
-        }
-    }    // Mostrar panel de configuración de usuario
+        }    }
+    
+    // Mostrar panel de configuración de usuario
     showUserPanel() {
         console.log('🔧 Abriendo panel de usuario...');
+        
+        // Verificar si el usuario está logueado
         if (!authManager.isLoggedIn()) {
             console.warn('❌ No hay usuario logueado');
+            return;
+        }
+
+        // Evitar múltiples aperturas - cerrar si ya existe
+        const existingOverlay = document.getElementById('userPanelOverlay');
+        if (existingOverlay) {
+            console.log('⚠️ Panel de usuario ya está abierto, cerrando...');
+            this.hideUserPanel();
             return;
         }
 
@@ -292,10 +303,30 @@ class AuthUI {
                 </div>
 
                 <div id="userPanelMessage" class="auth-message"></div>
-            </div>
-        `;
+            </div>        `;
+        
+        // Agregar event listener para cerrar al hacer click fuera del modal
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                this.hideUserPanel();
+            }
+        });
+
+        // Agregar event listener para cerrar con la tecla Escape
+        const escapeHandler = (e) => {
+            if (e.key === 'Escape') {
+                this.hideUserPanel();
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        };
+        document.addEventListener('keydown', escapeHandler);
         
         document.body.appendChild(overlay);
+        
+        // Aplicar foco al modal para accesibilidad
+        setTimeout(() => {
+            overlay.focus();
+        }, 100);
     }
 
     // Mostrar sección de cambiar contraseña
@@ -342,13 +373,23 @@ class AuthUI {
         } catch (error) {
             this.showUserPanelMessage(`❌ Error: ${error.message}`, 'error');
         }
-    }
-
-    // Ocultar panel de usuario
+    }    // Ocultar panel de usuario
     hideUserPanel() {
         const overlay = document.getElementById('userPanelOverlay');
         if (overlay) {
-            overlay.remove();
+            // Agregar animación de salida
+            overlay.style.animation = 'fadeOut 0.3s ease-out';
+            const container = overlay.querySelector('.auth-container');
+            if (container) {
+                container.style.animation = 'slideOut 0.3s ease-out';
+            }
+            
+            // Remover después de la animación
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
         }
     }
 

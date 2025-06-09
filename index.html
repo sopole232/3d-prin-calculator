@@ -7,9 +7,33 @@
         <link rel="stylesheet" href="styles.css"> 
     </head>     
     <body> 
-        <div class="container">            <div class="header"> 
-                <h1>🖨️ Panel de Impresión 3D</h1> 
-                <p>Gestión completa de costos y filamentos • Guardado automático activo</p>
+        <div class="container">            
+            <div class="header"> 
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1>🖨️ Panel de Impresión 3D</h1> 
+                        <p>Gestión completa de costos y filamentos • Guardado automático activo</p>
+                    </div>
+                    
+                    <!-- User indicator moved back to header with proper positioning -->
+                    <div id="userIndicator" class="user-indicator-header" style="display: none;">
+                        <div class="user-info">
+                            <span id="currentUser" class="user-welcome">👤 Usuario</span>
+                        </div>
+                        <div class="user-actions">
+                            <!-- Botones de sincronización compactos -->
+                            <button id="uploadCloudBtn" class="cloud-action-btn" title="Subir a la nube" onclick="uploadToCloudQuick()">
+                                <span class="cloud-icon">☁️</span>
+                                <span class="arrow-up">↑</span>
+                            </button>
+                            <button id="downloadCloudBtn" class="cloud-action-btn" title="Descargar de la nube" onclick="downloadFromCloudQuick()">
+                                <span class="cloud-icon">☁️</span>
+                                <span class="arrow-down">↓</span>
+                            </button>
+                            <button id="userMenuBtn" class="user-settings-btn">⚙️ Configuración</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="tabs">
@@ -822,27 +846,6 @@
     
     <!-- Sistema de sincronización rápida -->
     <script src="js/quick-sync.js"></script>
-    
-    <!-- Sección de configuración de usuario en la parte inferior -->
-    <footer class="user-settings-footer">
-        <div id="userIndicator" class="user-settings-container" style="display: none;">
-            <div class="user-info-section">
-                <span id="currentUser" class="user-welcome">👤 Usuario</span>
-            </div>
-            <div class="user-actions-section">
-                <!-- Botones de sincronización compactos -->
-                <button id="uploadCloudBtn" class="cloud-action-btn" title="Subir a la nube" onclick="uploadToCloudQuick()">
-                    <span class="cloud-icon">☁️</span>
-                    <span class="arrow-up">↑</span>
-                </button>
-                <button id="downloadCloudBtn" class="cloud-action-btn" title="Descargar de la nube" onclick="downloadFromCloudQuick()">
-                    <span class="cloud-icon">☁️</span>
-                    <span class="arrow-down">↓</span>
-                </button>
-                <button id="userMenuBtn" class="user-settings-btn">⚙️ Configuración</button>
-            </div>
-        </div>
-    </footer>
          
     </body>     
 </html>
